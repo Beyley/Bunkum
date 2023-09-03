@@ -119,7 +119,7 @@ internal class MainMiddleware : IMiddleware
 
                         // Pass in the request body as a parameter
                         if (param.Name == "body")
-                        {
+                        { 
                             // If the request has no body and we have a body parameter, then it's probably safe to assume it's required unless otherwise explicitly stated.
                             // Fire a bad request back if this is the case.
                             if (!context.HasBody && !method.HasCustomAttribute<AllowEmptyBodyAttribute>())
@@ -133,6 +133,13 @@ internal class MainMiddleware : IMiddleware
                             else if(paramType == typeof(byte[])) invokeList.Add(body.GetBuffer());
                             else if(attribute.ContentType == ContentType.Xml)
                             {
+                                body.Seek(-1, SeekOrigin.End);
+                                if (body.ReadByte() == 0)
+                                {
+                                    body.Seek(0, SeekOrigin.Begin);
+                                    body.SetLength(body.Length - 1);
+                                }
+                                
                                 XmlSerializer serializer = new(paramType);
                                 try
                                 {
