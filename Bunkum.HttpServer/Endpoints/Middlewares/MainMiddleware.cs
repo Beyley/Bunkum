@@ -133,11 +133,11 @@ internal class MainMiddleware : IMiddleware
                             else if(paramType == typeof(byte[])) invokeList.Add(body.GetBuffer());
                             else if(attribute.ContentType == ContentType.Xml)
                             {
-                                body.Seek(-1, SeekOrigin.End);
-                                if (body.ReadByte() == 0)
+                                //TODO: REMOVE THIS HACK!!!
+                                int idx = Array.IndexOf(body.ToArray(), 0);
+                                if (idx != -1)
                                 {
-                                    body.Seek(0, SeekOrigin.Begin);
-                                    body.SetLength(body.Length - 1);
+                                    body.SetLength(idx);
                                 }
                                 
                                 XmlSerializer serializer = new(paramType);
